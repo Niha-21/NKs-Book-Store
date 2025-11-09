@@ -1,0 +1,30 @@
+# Ignore target, build, and compiled files
+target/
+build/
+*.class
+
+# Maven & Gradle
+.mvn/
+.gradle/
+
+# IntelliJ & VS Code settings
+.idea/
+*.iml
+.vscode/
+
+# Logs & temp files
+logs/
+*.log
+*.tmp
+
+# OS-generated files
+.DS_Store
+Thumbs.db
+
+# Ignore sensitive config
+application.properties
+application.yml
+.env
+
+# Docker & Kubernetes
+docker-compose.override.yml
