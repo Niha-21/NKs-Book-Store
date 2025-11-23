@@ -2,15 +2,18 @@ package com.nksbookstore.user.controller;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.nksbookstore.user.model.LoginRequest;
+import com.nksbookstore.user.model.LoginResponse;
 import com.nksbookstore.user.model.UserDTO;
 import com.nksbookstore.user.service.AuthService;
+import com.nksbookstore.user.service.UserDetailsService;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +23,8 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class AuthController {
     
-    private final AuthService userService;
+    private final UserDetailsService userService;
+    private final AuthService authService;
 
     @GetMapping
     public List<UserDTO> getUsers() {
@@ -34,6 +38,12 @@ public class AuthController {
 
         return ResponseEntity.ok(response);
 
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest request) {
+        String token = authService.login(request.username(), request.password());
+        return ResponseEntity.ok(new LoginResponse(token));
     }
 
 }
