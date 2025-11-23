@@ -32,7 +32,7 @@ public class JwtTokenProvider {
         return Jwts.builder()
                 .setSubject(userPrincipal.getUsername())
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(new Date().getTime() + jwtExpirationMs))
+                .setExpiration(new Date(System.currentTimeMillis() + jwtExpirationMs))
                 .signWith(getSigningKey(), SignatureAlgorithm.HS512)
                 .compact();
     }
@@ -40,7 +40,6 @@ public class JwtTokenProvider {
     public String getUsernameFromToken(String token) {
         return Jwts.parser()
                 .setSigningKey(getSigningKey())
-                .build()
                 .parseClaimsJws(token)
                 .getBody()
                 .getSubject();
@@ -49,9 +48,8 @@ public class JwtTokenProvider {
     public boolean validateToken(String authToken) {
         try {
             Jwts.parser()
-            .setSigningKey(getSigningKey())
-            .build()
-            .parseClaimsJws(authToken);
+                .setSigningKey(getSigningKey())
+                .parseClaimsJws(authToken);
             return true;
         } catch (Exception e) {
             System.out.println("Error in validateToken : " + e);
