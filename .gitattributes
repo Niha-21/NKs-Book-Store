@@ -1,2 +1,18 @@
 /mvnw text eol=lf
 *.cmd text eol=crlf
+
+# --- Line Ending Normalization ---
+* text=auto
+
+# --- Explicitly binary files (No line ending changes) ---
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.pdf binary
+*.zip binary
+*.tar.gz binary
+
+# --- Vite/Node build output files ---
+*.map text
