@@ -8,6 +8,6 @@ public interface UserDetailsService {
 
     public List<UserDTO> getAllUsers();
 
-    public String register(UserDTO user);
+    public Boolean register(UserDTO user);
     
 }

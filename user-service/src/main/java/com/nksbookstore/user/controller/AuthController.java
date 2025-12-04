@@ -2,6 +2,7 @@ package com.nksbookstore.user.controller;
 
 import java.util.List;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -34,10 +35,14 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<String> register(@Valid @RequestBody UserDTO user) {
 
-        String response = userService.register(user); 
+        Boolean response = userService.register(user); 
 
-        return ResponseEntity.ok(response);
-
+        if(!response) {
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+            .body("User already exists");
+        }
+        return ResponseEntity.ok("User Registered");
+        
     }
 
     @PostMapping("/login")

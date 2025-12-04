@@ -45,12 +45,12 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     }
 
-    public String register(UserDTO userDTO) {
+    public Boolean register(UserDTO userDTO) {
 
         try{
 
             if(userRepository.findByUsername(userDTO.getUsername()).isPresent()) {
-                throw new RuntimeException("Username already exists");
+                return false;
             };
 
             User user = new User();
@@ -61,10 +61,10 @@ public class UserDetailsServiceImpl implements UserDetailsService {
             userRepository.save(user);
 
         } catch(Exception e) {
-            return e.getMessage();
+            e.printStackTrace();
         }
 
-        return "User Registered successfully !";
+        return true;
 
     }
 
