@@ -14,7 +14,7 @@ import com.nksbookstore.user.model.LoginRequest;
 import com.nksbookstore.user.model.LoginResponse;
 import com.nksbookstore.user.model.UserDTO;
 import com.nksbookstore.user.service.AuthService;
-import com.nksbookstore.user.service.UserDetailsService;
+import com.nksbookstore.user.service.UserService;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +24,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class AuthController {
     
-    private final UserDetailsService userService;
+    private final UserService userService;
     private final AuthService authService;
 
     @GetMapping
@@ -35,12 +35,8 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<String> register(@Valid @RequestBody UserDTO user) {
 
-        Boolean response = userService.register(user); 
-
-        if(!response) {
-            return ResponseEntity.status(HttpStatus.CONFLICT)
-            .body("User already exists");
-        }
+        userService.register(user); 
+        
         return ResponseEntity.ok("User Registered");
         
     }

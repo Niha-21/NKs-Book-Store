@@ -3,25 +3,20 @@ package com.nksbookstore.user.service.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.nksbookstore.user.model.UserDTO;
-import com.nksbookstore.user.config.JwtTokenProvider;
 import com.nksbookstore.user.entity.User;
+import com.nksbookstore.user.exception.UserAlreadyExistsException;
 import com.nksbookstore.user.repository.UserRepository;
-import com.nksbookstore.user.service.UserDetailsService;
+import com.nksbookstore.user.service.UserService;
 
 import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class UserDetailsServiceImpl implements UserDetailsService {
+public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
@@ -47,25 +42,19 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     public Boolean register(UserDTO userDTO) {
 
-        try{
+        if(userRepository.findByUsername(userDTO.getUsername()).isPresent()) {
+            throw new UserAlreadyExistsException("User already exists");
+        };
 
-            if(userRepository.findByUsername(userDTO.getUsername()).isPresent()) {
-                return false;
-            };
+        User user = new User();
+        user.setUsername(userDTO.getUsername());
+        user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
+        user.setEmail(userDTO.getEmail());
 
-            User user = new User();
-            user.setUsername(userDTO.getUsername());
-            user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
-            user.setEmail(userDTO.getEmail());
-
-            userRepository.save(user);
-
-        } catch(Exception e) {
-            e.printStackTrace();
-        }
+        userRepository.save(user);
 
         return true;
-
+    
     }
 
 }

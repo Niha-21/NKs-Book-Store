@@ -2,6 +2,7 @@ package com.nksbookstore.user.service.impl;
 
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import com.nksbookstore.user.entity.User;
@@ -18,7 +19,7 @@ public class CustomUserServiceImpl implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) {
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new UsernameNotFoundException("User Not Found"));
 
         return org.springframework.security.core.userdetails.User
                 .withUsername(user.getUsername())
