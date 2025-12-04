@@ -1,9 +1,10 @@
 import { useState } from "react";
 import axios from "axios";
+import { Link } from "react-router-dom";
 
 function Login() {
 
-  const [username, setEmail] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 
@@ -40,7 +41,7 @@ function Login() {
           <input 
             type="text"
             value={username}
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={(e) => setUsername(e.target.value)}
           />
         </div>
 
@@ -60,6 +61,9 @@ function Login() {
           Login
         </button>
       </form>
+      <p>
+        Don’t have an account? <Link to="/register">Register here</Link>
+      </p>
     </div>
   );
 }

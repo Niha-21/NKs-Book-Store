@@ -1,0 +1,97 @@
+import { useState } from "react";
+import axios from "axios";
+
+function Register() {
+  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [message, setMessage] = useState("");
+
+  const handleRegister = async (e) => {
+    e.preventDefault();
+
+    try {
+      const response = await axios.post("http://localhost:8081/auth/register", {
+        username,
+        password,
+        email
+      });
+
+      setMessage(response.data);
+      setUsername("");
+      setPassword("");
+      setEmail("");
+    } catch (error) {
+      setMessage("Registration failed. User may already exist.");
+    }
+  };
+
+  return (
+    <div style={styles.container}>
+      <h2>Register</h2>
+
+      <form onSubmit={handleRegister} style={styles.form}>
+        <input
+          type="text"
+          placeholder="Enter username"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+          style={styles.input}
+        />
+
+        <input
+          type="password"
+          placeholder="Enter password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          style={styles.input}
+        />
+
+        <input
+          type="email"
+          placeholder="Enter email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          style={styles.input}
+        />
+
+        <button type="submit" style={styles.button}>
+          Register
+        </button>
+      </form>
+
+      {message && <p style={{ marginTop: "20px" }}>{message}</p>}
+      
+    </div>
+  );
+}
+
+const styles = {
+  container: {
+    maxWidth: "350px",
+    margin: "50px auto",
+    textAlign: "center",
+    padding: "20px",
+    border: "1px solid #ddd",
+    borderRadius: "8px",
+  },
+  form: {
+    display: "flex",
+    flexDirection: "column",
+    gap: "15px",
+  },
+  input: {
+    padding: "10px",
+    fontSize: "16px",
+  },
+  button: {
+    padding: "10px",
+    backgroundColor: "#0070f3",
+    color: "#fff",
+    cursor: "pointer",
+    border: "none",
+    borderRadius: "5px",
+  },
+};
+
+export default Register;
