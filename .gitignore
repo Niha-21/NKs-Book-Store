@@ -29,6 +29,11 @@ application.yml
 # Docker & Kubernetes
 docker-compose.override.yml
 
+# Environment files
+.env
+.env.* 
+!.env.example
+
 # Logs
 logs
 *.log
