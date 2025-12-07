@@ -1,5 +1,5 @@
 import { useState } from "react";
-import api from "../api";
+import baseApi from "../apis/baseApi";
 import { Link } from "react-router-dom";
 
 function Login() {
@@ -13,7 +13,7 @@ function Login() {
     setError("");
 
     try {
-      const response = await api.post("/auth/login", {
+      const response = await baseApi.post("/auth/login", {
         username,
         password
       });

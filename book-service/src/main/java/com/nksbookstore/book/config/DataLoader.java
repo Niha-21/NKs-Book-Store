@@ -28,19 +28,19 @@ public class DataLoader implements CommandLineRunner {
         b1.setTitle("Atomic Habits");
         b1.setDescription("A guide to building good habits.");
         b1.setPrice(new BigDecimal("399"));
-        b1.setImageUrl("https://example.com/atomic_habits.jpg");
+        b1.setImageUrl("/images/Atomic Habits.jpg");
 
         Book b2 = new Book();
         b2.setTitle("The Alchemist");
         b2.setDescription("A magical story about pursuing dreams.");
         b2.setPrice(new BigDecimal("299"));
-        b2.setImageUrl("https://example.com/alchemist.jpg");
+        b2.setImageUrl("/images/The Alchemist.jpg");
 
         Book b3 = new Book();
         b3.setTitle("Clean Code");
         b3.setDescription("A handbook of agile software craftsmanship.");
         b3.setPrice(new BigDecimal("599"));
-        b3.setImageUrl("https://example.com/clean_code.jpg");
+        b3.setImageUrl("/images/Clean Code.jpg");
 
         bookRepository.saveAll(List.of(b1, b2, b3));
 
