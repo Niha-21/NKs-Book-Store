@@ -43,7 +43,6 @@ public class BookServiceImpl implements BookService {
             book.getId(),
             book.getTitle(),
             book.getDescription(),
-            book.getCoverImg(),
             book.getImageUrl(),
             book.getPrice()
         );

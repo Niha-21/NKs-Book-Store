@@ -23,8 +23,6 @@ public class Book {
     private String title;
 
     private String description;
-    
-    private String coverImg;
 
     private String imageUrl;
 
