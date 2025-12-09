@@ -7,6 +7,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import com.nksbookstore.user.config.JwtTokenProvider;
+import com.nksbookstore.user.repository.UserRepository;
 import com.nksbookstore.user.service.AuthService;
 
 import lombok.RequiredArgsConstructor;
@@ -17,6 +18,7 @@ public class AuthServiceImpl implements AuthService {
 
     private final AuthenticationManager authenticationManager;
     private final JwtTokenProvider jwtTokenProvider;
+    private final UserRepository userRepository;
 
     public String login(String username, String password) {
 
@@ -27,6 +29,13 @@ public class AuthServiceImpl implements AuthService {
         
         return jwtTokenProvider.generateToken(authentication);
 
+    }
+
+    public Boolean checkUserExistence(String id) {
+
+        Long userId = Long.parseLong(id);
+        return userRepository.existsById(userId);
+    
     }
 
 }

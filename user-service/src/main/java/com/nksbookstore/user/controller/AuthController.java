@@ -2,8 +2,8 @@ package com.nksbookstore.user.controller;
 
 import java.util.List;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -29,6 +29,9 @@ public class AuthController {
 
     @GetMapping
     public List<UserDTO> getUsers() {
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        
+        System.out.println("userId = " + principal.toString() );
         return userService.getAllUsers(); 
     }
 

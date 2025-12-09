@@ -10,6 +10,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
+import com.nksbookstore.user.model.CustomUserDetails;
+
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
@@ -30,7 +32,8 @@ public class JwtTokenProvider {
         UserDetails userPrincipal = (UserDetails) authentication.getPrincipal();
 
         return Jwts.builder()
-                .setSubject(userPrincipal.getUsername())
+                .setSubject(((CustomUserDetails) userPrincipal).getId().toString())
+                // .claim("userId", ((CustomUserDetails) userPrincipal).getId())
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + jwtExpirationMs))
                 .signWith(getSigningKey(), SignatureAlgorithm.HS512)
@@ -55,6 +58,15 @@ public class JwtTokenProvider {
             System.out.println("Error in validateToken : " + e);
         }
         return false;
+    }
+
+    public String getUserIdFromToken(String token) {
+        return Jwts.parser()
+                .setSigningKey(getSigningKey())
+                .parseClaimsJws(token)
+                .getBody()
+                .getSubject();
+                // .get("userId", Long.class);
     }
 
 }
