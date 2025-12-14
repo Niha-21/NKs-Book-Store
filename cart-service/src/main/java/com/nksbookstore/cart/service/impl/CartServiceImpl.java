@@ -9,6 +9,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.nksbookstore.cart.entity.Cart;
 import com.nksbookstore.cart.entity.CartItem;
+import com.nksbookstore.cart.exception.CartItemNotFoundException;
+import com.nksbookstore.cart.exception.CartNotFoundException;
 import com.nksbookstore.cart.model.CartItemDTO;
 import com.nksbookstore.cart.repository.CartItemRepository;
 import com.nksbookstore.cart.repository.CartRepository;
@@ -64,7 +66,7 @@ public class CartServiceImpl implements CartService {
         Long userId = Long.parseLong(getLoggedInUserId());
 
         Cart cart = cartRepository.findByUserId(userId)
-                .orElseThrow(() -> new RuntimeException("Cart not found"));
+                .orElseThrow(() -> new CartNotFoundException("Cart not found"));
 
         return cart.getCartItems()
                     .stream()
@@ -79,7 +81,7 @@ public class CartServiceImpl implements CartService {
         Long userId = Long.parseLong(getLoggedInUserId());
 
         CartItem cartItem = cartItemRepository.findById(cartItemId)
-                .orElseThrow(() -> new RuntimeException("CartItem not found"));
+                .orElseThrow(() -> new CartItemNotFoundException("CartItem not found"));
 
         Cart cart = cartItem.getCart();
 
@@ -98,7 +100,7 @@ public class CartServiceImpl implements CartService {
         Long userId = Long.parseLong(getLoggedInUserId());
 
         Cart cart = cartRepository.findByUserId(userId)
-                .orElseThrow(() -> new RuntimeException("Cart not found for user"));
+                .orElseThrow(() -> new CartNotFoundException("Cart not found for user"));
 
         cart.getCartItems().clear();
 

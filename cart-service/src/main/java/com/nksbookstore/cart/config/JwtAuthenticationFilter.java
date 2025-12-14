@@ -55,8 +55,23 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             }
 
             filterChain.doFilter(request, response);
-        } catch (Exception e) {
-            e.printStackTrace();
+            
+        } catch (io.jsonwebtoken.ExpiredJwtException e) {
+            SecurityContextHolder.clearContext();
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.setContentType("application/json");
+            response.getWriter().write("""
+                { "error": "JWT_EXPIRED", "message": "Session expired" }
+            """);
+            return; // ⛔ STOP HERE
+        } catch (io.jsonwebtoken.JwtException e) {
+            SecurityContextHolder.clearContext();
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.setContentType("application/json");
+            response.getWriter().write("""
+                { "error": "INVALID_JWT", "message": "Invalid token" }
+            """);
+            return; // ⛔ STOP HERE
         }
         
     }
