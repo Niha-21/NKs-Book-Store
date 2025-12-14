@@ -10,8 +10,11 @@ import lombok.RequiredArgsConstructor;
 
 import java.util.List;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -23,21 +26,35 @@ public class CartController {
     
     private final CartService cartService;
 
-    @PostMapping("/add")
-    public ResponseEntity addToCart(@RequestBody CartItemDTO cartItem) {
+    @PostMapping("/items")
+    public ResponseEntity<Void> addToCart(@RequestBody CartItemDTO cartItem) {
         
         cartService.addToCart(cartItem);
-        
-        return ResponseEntity.ok(null);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+
     }
 
-    @GetMapping("/get")
-    public List<CartItemDTO> getCartItems() {
+    @GetMapping("/items")
+    public ResponseEntity<List<CartItemDTO>> getCartItems() {
         
-        return cartService.getCartItems();
+        return ResponseEntity.ok(cartService.getCartItems());
 
     }
     
-    
+    @DeleteMapping("/items/{cartItemId}")
+    public ResponseEntity<Void> removeCartItem(@PathVariable Long cartItemId) {
+
+        cartService.removeItem(cartItemId);
+        return ResponseEntity.noContent().build();
+
+    }
+
+    @DeleteMapping
+    public ResponseEntity<Void> clearCart() {
+
+        cartService.clearCart();
+        return ResponseEntity.noContent().build();
+    }
+
 
 }

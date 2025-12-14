@@ -28,6 +28,6 @@ public class CartItem {
     private Long bookId;
 
     @Column(nullable = false)
-    private Integer qunatity;
+    private Integer quantity;
     
 }

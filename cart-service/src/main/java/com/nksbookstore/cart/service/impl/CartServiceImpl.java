@@ -18,13 +18,13 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
 public class CartServiceImpl implements CartService {
 
     private final CartRepository cartRepository;
     private final CartItemRepository cartItemRepository;
 
     @Override
+    @Transactional
     public void addToCart(CartItemDTO cartItemRequest) {
 
         // Get or create cart
@@ -39,12 +39,10 @@ public class CartServiceImpl implements CartService {
                     return cartRepository.save(newCart);
                 });
 
-        // Check if book already exists in cart
-        List<CartItem> existingItems = cartItemRepository.findByCartId(cart.getId());
-
-        for (CartItem item : existingItems) {
+        // if book already exists in cart, increase quantity
+        for (CartItem item : cart.getCartItems()) {
             if (item.getBookId().equals(bookId)) {
-                item.setQunatity(item.getQunatity() + quantity);
+                item.setQuantity(item.getQuantity() + quantity);
                 cartItemRepository.save(item);
                 return;
             }
@@ -54,9 +52,10 @@ public class CartServiceImpl implements CartService {
         CartItem cartItem = new CartItem();
         cartItem.setCart(cart);
         cartItem.setBookId(bookId);
-        cartItem.setQunatity(quantity);
+        cartItem.setQuantity(quantity);
 
-        cartItemRepository.save(cartItem);
+        cart.getCartItems().add(cartItem);
+
     }
 
     @Override
@@ -67,22 +66,42 @@ public class CartServiceImpl implements CartService {
         Cart cart = cartRepository.findByUserId(userId)
                 .orElseThrow(() -> new RuntimeException("Cart not found"));
 
-        return cartItemRepository.findByCartId(cart.getId())
-                                .stream().map(this::convertEntityToDTO).toList();
+        return cart.getCartItems()
+                    .stream()
+                    .map(this::convertEntityToDTO)
+                    .toList();
     }
 
     @Override
+    @Transactional
     public void removeItem(Long cartItemId) {
-        cartItemRepository.deleteById(cartItemId);
+
+        Long userId = Long.parseLong(getLoggedInUserId());
+
+        CartItem cartItem = cartItemRepository.findById(cartItemId)
+                .orElseThrow(() -> new RuntimeException("CartItem not found"));
+
+        Cart cart = cartItem.getCart();
+
+        if (!cart.getUserId().equals(userId)) {
+            throw new RuntimeException("Unauthorized cart access");
+        }
+
+        cart.getCartItems().remove(cartItem);
+
     }
 
     @Override
-    public void clearCart(Long userId) {
-        Cart cart = cartRepository.findByUserId(userId)
-                .orElseThrow(() -> new RuntimeException("Cart not found"));
+    @Transactional
+    public void clearCart() {
 
-        List<CartItem> items = cartItemRepository.findByCartId(cart.getId());
-        cartItemRepository.deleteAll(items);
+        Long userId = Long.parseLong(getLoggedInUserId());
+
+        Cart cart = cartRepository.findByUserId(userId)
+                .orElseThrow(() -> new RuntimeException("Cart not found for user"));
+
+        cart.getCartItems().clear();
+
     }
 
     private CartItemDTO convertEntityToDTO(CartItem cartItem) {
@@ -91,7 +110,7 @@ public class CartServiceImpl implements CartService {
             cartItem.getId(),
             cartItem.getCart().getId(),
             cartItem.getBookId(),
-            cartItem.getQunatity()
+            cartItem.getQuantity()
         );
 
     }
