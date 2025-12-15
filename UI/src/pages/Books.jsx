@@ -1,8 +1,12 @@
 import { useEffect, useState } from "react";
 import booksApi from "../apis/booksApi";
+import cartApi from "../apis/cartApi";
+import { useNavigate } from "react-router-dom";
 
 function Books() {
   const [books, setBooks] = useState([]);
+  const [addingBookId, setAddingBookId] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchBooks();
@@ -17,9 +21,38 @@ function Books() {
     }
   };
 
+  const addToCart = async (bookId) => {
+    try {
+
+      if(!localStorage.getItem("token")) {
+        navigate("/login");
+        return;
+      }
+
+      setAddingBookId(bookId);
+
+      await cartApi.post("/cart/items", {
+        bookId: bookId,
+        quantity: 1,
+      });
+
+      alert("Item added to cart!");
+
+    } catch (error) {
+      if (error.response.status === 401) {
+        localStorage.removeItem("token");
+        navigate("/login");
+      }
+      console.log("Error adding to cart", error);
+      alert("Please login to add items to cart");
+    } finally {
+      setAddingBookId(null);
+    }
+  };
+
   return (
     <div style={styles.container}>
-      <h2>Book Store</h2>
+      <h2>NKS Book Store</h2>
 
       <div style={styles.grid}>
         {books.map((book) => (
@@ -32,7 +65,13 @@ function Books() {
             <h3>{book.title}</h3>
             <p>{book.description}</p>
             <p style={styles.price}>₹{book.price}</p>
-            <button style={styles.button}>Add to Cart</button>
+            <button
+              style={styles.button}
+              disabled={addingBookId === book.id}
+              onClick={() => addToCart(book.id)}
+            >
+              {addingBookId === book.id ? "Adding..." : "Add to Cart"}
+            </button>
           </div>
         ))}
       </div>
