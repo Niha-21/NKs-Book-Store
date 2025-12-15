@@ -1,6 +1,7 @@
 package com.nksbookstore.cart.service.impl;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -76,21 +77,26 @@ public class CartServiceImpl implements CartService {
 
     @Override
     @Transactional
-    public void removeItem(Long cartItemId) {
+    public void removeCartItem(Long cartItemId) {
 
         Long userId = Long.parseLong(getLoggedInUserId());
 
-        CartItem cartItem = cartItemRepository.findById(cartItemId)
-                .orElseThrow(() -> new CartItemNotFoundException("CartItem not found"));
+        Cart cart = cartRepository.findByUserId(userId)
+                .orElseThrow(() -> new CartNotFoundException("Cart not found"));
 
-        Cart cart = cartItem.getCart();
+        Optional<CartItem> cartItemOptional = cart.getCartItems().stream()
+                                        .filter(item -> item.getId().equals(cartItemId))
+                                        .findFirst();
+        
+        if(cartItemOptional.isPresent()) {
+            
+            CartItem itemToRemove = cartItemOptional.get();
+            cart.getCartItems().remove(itemToRemove);
 
-        if (!cart.getUserId().equals(userId)) {
-            throw new RuntimeException("Unauthorized cart access");
+        } else {
+            throw new CartItemNotFoundException("CartItem not found");
         }
-
-        cart.getCartItems().remove(cartItem);
-
+    
     }
 
     @Override

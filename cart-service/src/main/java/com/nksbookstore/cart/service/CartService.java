@@ -10,7 +10,7 @@ public interface CartService {
 
     List<CartItemDTO> getCartItems();
 
-    void removeItem(Long cartItemId);
+    void removeCartItem(Long cartItemId);
 
     void clearCart();
     
