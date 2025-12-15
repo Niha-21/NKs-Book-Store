@@ -35,29 +35,60 @@ public class CartServiceImpl implements CartService {
         Long bookId = cartItemRequest.getBookId();
         Integer quantity = cartItemRequest.getQuantity();
 
-        Cart cart = cartRepository.findByUserId(userId)
+        Cart cart = getOrCreateCart(userId);
+
+        Optional<CartItem> cartItemOptional = cart.getCartItems().stream()
+                                                .filter(item -> item.getBookId().equals(bookId))
+                                                .findFirst();
+
+        if(cartItemOptional.isPresent()) {
+            cartItemOptional.get().setQuantity(quantity);
+        } else {            
+            // create new CartItem
+            CartItem cartItem = new CartItem();
+            cartItem.setCart(cart);
+            cartItem.setBookId(bookId);
+            cartItem.setQuantity(quantity);
+
+            cart.getCartItems().add(cartItem);
+        }    
+
+    }
+
+    private Cart getOrCreateCart(Long userId) {
+
+        return cartRepository.findByUserId(userId)
                 .orElseGet(() -> {
                     Cart newCart = new Cart();
                     newCart.setUserId(userId);
                     return cartRepository.save(newCart);
                 });
 
-        // if book already exists in cart, increase quantity
-        for (CartItem item : cart.getCartItems()) {
-            if (item.getBookId().equals(bookId)) {
-                item.setQuantity(item.getQuantity() + quantity);
-                cartItemRepository.save(item);
+    }
+
+    @Override
+    @Transactional
+    public void updateCartItemQuantity(CartItemDTO cartItemRequest) {
+
+        Long userId = Long.parseLong(getLoggedInUserId());
+        Long cartItemId = cartItemRequest.getId();
+        Integer quantity = cartItemRequest.getQuantity();
+
+        Cart cart = getOrCreateCart(userId);
+
+        Optional<CartItem> cartItemOptional = cart.getCartItems().stream()
+                                                .filter(item -> item.getId().equals(cartItemId))
+                                                .findFirst();
+
+        if(cartItemOptional.isPresent()) {
+            if(quantity <= 0) {
+                cart.getCartItems().remove(cartItemOptional.get());
                 return;
             }
+            cartItemOptional.get().setQuantity(quantity);
+        } else {
+            throw new CartItemNotFoundException("Item not found");
         }
-
-        // create new CartItem
-        CartItem cartItem = new CartItem();
-        cartItem.setCart(cart);
-        cartItem.setBookId(bookId);
-        cartItem.setQuantity(quantity);
-
-        cart.getCartItems().add(cartItem);
 
     }
 
@@ -94,7 +125,7 @@ public class CartServiceImpl implements CartService {
             cart.getCartItems().remove(itemToRemove);
 
         } else {
-            throw new CartItemNotFoundException("CartItem not found");
+            throw new CartItemNotFoundException("Item not found");
         }
     
     }
