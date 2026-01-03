@@ -5,6 +5,8 @@ import App from './App.jsx'
 import Login from './pages/Login.jsx';
 import Register from "./pages/Register";
 import Books from "./pages/Books";
+import Cart from "./pages/Cart";
+
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <BrowserRouter>
@@ -12,6 +14,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
       <Route path="/home" element={<Books />} />
+      <Route path="/cart" element={<Cart />} />
     </Routes>
   </BrowserRouter>
 )
