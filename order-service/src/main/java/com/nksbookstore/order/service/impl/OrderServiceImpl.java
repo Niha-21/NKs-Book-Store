@@ -1,7 +1,9 @@
 package com.nksbookstore.order.service.impl;
 
+import com.nksbookstore.order.model.CartItemDTO;
 import com.nksbookstore.order.model.OrderItemResponseDTO;
 import com.nksbookstore.order.model.OrderResponseDTO;
+import com.nksbookstore.order.client.CartClient;
 import com.nksbookstore.order.entity.Order;
 import com.nksbookstore.order.entity.OrderItem;
 import com.nksbookstore.order.entity.OrderStatus;
@@ -23,23 +25,42 @@ import java.util.List;
 public class OrderServiceImpl implements OrderService {
 
     private final OrderRepository orderRepository;
+    private final CartClient cartClient;
 
     @Override
+    @Transactional
     public OrderResponseDTO createOrder() {
+        
+        List<CartItemDTO> cartItems = cartClient.getCartItems();
 
-        // TODO: fetch cart items from Cart Service
-        // For now assume cartItems available
+        if (cartItems.isEmpty()) {
+            throw new IllegalStateException("Cart is empty, cannot create order");
+        }
+
+        BigDecimal totalAmount = cartItems.stream()
+            .map(item -> item.getPrice().multiply(BigDecimal.valueOf(item.getQuantity())))
+            .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         Long userId = Long.parseLong(getLoggedInUserId());
 
         Order order = new Order();
         order.setUserId(userId);
+        order.setTotalAmount(totalAmount);
         order.setStatus(OrderStatus.CREATED);
 
-        // TODO: map cart items → order items
-        // calculate totalAmount
-
-        order.setTotalAmount(BigDecimal.ZERO); // placeholder
+        List<OrderItem> orderItems = cartItems.stream()
+            .map(item -> {
+                OrderItem orderItem = new OrderItem();
+                orderItem.setOrder(order);
+                orderItem.setBookId(item.getBookId());
+                orderItem.setBookName(item.getBookName());
+                orderItem.setQuantity(item.getQuantity());
+                orderItem.setPrice(item.getPrice());
+                return orderItem;
+            })
+            .toList();
+        
+        order.setOrderItems(orderItems);
 
         Order savedOrder = orderRepository.save(order);
         return mapToOrderResponse(savedOrder);
@@ -62,9 +83,7 @@ public class OrderServiceImpl implements OrderService {
                 .orElseThrow(() -> new RuntimeException("Order not found"));
         return mapToOrderResponse(order);
     }
-
-    // ---------------- MAPPING ----------------
-
+    
     private OrderResponseDTO mapToOrderResponse(Order order) {
 
         OrderResponseDTO dto = new OrderResponseDTO();
