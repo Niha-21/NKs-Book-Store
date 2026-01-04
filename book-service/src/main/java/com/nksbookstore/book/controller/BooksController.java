@@ -9,6 +9,8 @@ import com.nksbookstore.book.model.BookDTO;
 import com.nksbookstore.book.service.BookService;
 
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
@@ -21,16 +23,16 @@ public class BooksController {
     private final BookService bookService;
 
     @GetMapping("/listBooks")
-    public List<BookDTO> getBooks() {
+    public ResponseEntity<List<BookDTO>> getBooks() {
 
-        return bookService.getBooks();
+        return ResponseEntity.ok(bookService.getBooks());
 
     }
     
     @GetMapping("/{id}")
-    public BookDTO getBookById(@PathVariable Long id) {
+    public ResponseEntity<BookDTO> getBookById(@PathVariable Long id) {
         
-        return bookService.getBookById(id);
+        return ResponseEntity.ok(bookService.getBookById(id));
 
     }
     
