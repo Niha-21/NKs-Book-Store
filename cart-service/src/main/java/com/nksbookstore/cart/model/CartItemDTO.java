@@ -1,5 +1,7 @@
 package com.nksbookstore.cart.model;
 
+import java.math.BigDecimal;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -12,6 +14,10 @@ public class CartItemDTO {
     private Long cartId;
 
     private Long bookId;
+    
+    private String bookName;
+    
+    private BigDecimal price;
 
     private Integer quantity;
 

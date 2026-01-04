@@ -1,6 +1,7 @@
 package com.nksbookstore.cart.service.impl;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import org.springframework.security.core.Authentication;
@@ -13,9 +14,14 @@ import com.nksbookstore.cart.entity.CartItem;
 import com.nksbookstore.cart.exception.CartItemNotFoundException;
 import com.nksbookstore.cart.exception.CartNotFoundException;
 import com.nksbookstore.cart.model.CartItemDTO;
+import com.nksbookstore.cart.model.BookDTO;
 import com.nksbookstore.cart.repository.CartItemRepository;
 import com.nksbookstore.cart.repository.CartRepository;
 import com.nksbookstore.cart.service.CartService;
+
+import feign.FeignException;
+
+import com.nksbookstore.cart.client.BookClient;
 
 import lombok.RequiredArgsConstructor;
 
@@ -25,6 +31,7 @@ public class CartServiceImpl implements CartService {
 
     private final CartRepository cartRepository;
     private final CartItemRepository cartItemRepository;
+    private final BookClient bookClient;
 
     @Override
     @Transactional
@@ -102,7 +109,16 @@ public class CartServiceImpl implements CartService {
 
         return cart.getCartItems()
                     .stream()
-                    .map(this::convertEntityToDTO)
+                    .map(cartItem -> {
+                        try {
+                            BookDTO book = bookClient.getBookById(cartItem.getBookId());
+                            return convertEntityToDTO(cartItem, book);
+                        } catch (FeignException.NotFound e) {
+                            // Book not found, skip item
+                            return null;
+                        }
+                    })
+                    .filter(Objects::nonNull)
                     .toList();
     }
 
@@ -143,12 +159,14 @@ public class CartServiceImpl implements CartService {
 
     }
 
-    private CartItemDTO convertEntityToDTO(CartItem cartItem) {
+    private CartItemDTO convertEntityToDTO(CartItem cartItem, BookDTO book) {
 
         return new CartItemDTO(
             cartItem.getId(),
             cartItem.getCart().getId(),
-            cartItem.getBookId(),
+            book.getId(),
+            book.getTitle(),
+            book.getPrice(),
             cartItem.getQuantity()
         );
 
