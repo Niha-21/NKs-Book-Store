@@ -1,14 +1,13 @@
 package com.nksbookstore.cart.service;
 
-import java.util.List;
-
 import com.nksbookstore.cart.model.CartItemDTO;
+import com.nksbookstore.cart.model.CartResponseDTO;
 
 public interface CartService {
         
     void addToCart(CartItemDTO cartItem);
 
-    List<CartItemDTO> getCartItems();
+    CartResponseDTO getCart();
 
     void removeCartItem(Long cartItemId);
 

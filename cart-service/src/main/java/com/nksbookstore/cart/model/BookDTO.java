@@ -10,6 +10,8 @@ public class BookDTO {
     private Long id;
 
     private String title;
+
+    private String imageUrl;
     
     private BigDecimal price;
     

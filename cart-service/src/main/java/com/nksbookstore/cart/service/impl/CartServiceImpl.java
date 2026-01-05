@@ -1,5 +1,6 @@
 package com.nksbookstore.cart.service.impl;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -14,6 +15,7 @@ import com.nksbookstore.cart.entity.CartItem;
 import com.nksbookstore.cart.exception.CartItemNotFoundException;
 import com.nksbookstore.cart.exception.CartNotFoundException;
 import com.nksbookstore.cart.model.CartItemDTO;
+import com.nksbookstore.cart.model.CartResponseDTO;
 import com.nksbookstore.cart.model.BookDTO;
 import com.nksbookstore.cart.repository.CartItemRepository;
 import com.nksbookstore.cart.repository.CartRepository;
@@ -100,14 +102,15 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
-    public List<CartItemDTO> getCartItems() {
+    public CartResponseDTO getCart() {
 
         Long userId = Long.parseLong(getLoggedInUserId());
 
         Cart cart = cartRepository.findByUserId(userId)
                 .orElseThrow(() -> new CartNotFoundException("Cart not found"));
 
-        return cart.getCartItems()
+        List<CartItemDTO> cartItems = 
+                    cart.getCartItems()
                     .stream()
                     .map(cartItem -> {
                         try {
@@ -120,6 +123,13 @@ public class CartServiceImpl implements CartService {
                     })
                     .filter(Objects::nonNull)
                     .toList();
+        
+        BigDecimal cartTotal = cartItems.stream()
+            .map(item ->
+            item.getPrice().multiply(BigDecimal.valueOf(item.getQuantity())))
+            .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        return new CartResponseDTO(cartItems, cartTotal);
     }
 
     @Override
@@ -166,6 +176,7 @@ public class CartServiceImpl implements CartService {
             cartItem.getCart().getId(),
             book.getId(),
             book.getTitle(),
+            book.getImageUrl(),
             book.getPrice(),
             cartItem.getQuantity()
         );

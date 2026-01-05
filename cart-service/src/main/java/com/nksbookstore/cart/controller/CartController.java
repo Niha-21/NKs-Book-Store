@@ -4,11 +4,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.nksbookstore.cart.model.CartItemDTO;
+import com.nksbookstore.cart.model.CartResponseDTO;
 import com.nksbookstore.cart.service.CartService;
 
 import lombok.RequiredArgsConstructor;
-
-import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -35,10 +34,10 @@ public class CartController {
 
     }
 
-    @GetMapping("/items")
-    public ResponseEntity<List<CartItemDTO>> getCartItems() {
+    @GetMapping
+    public ResponseEntity<CartResponseDTO> getCart() {
         
-        return ResponseEntity.ok(cartService.getCartItems());
+        return ResponseEntity.ok(cartService.getCart());
 
     }
     

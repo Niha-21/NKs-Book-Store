@@ -15,7 +15,9 @@ public class CartItemDTO {
 
     private Long bookId;
     
-    private String bookName;
+    private String bookName;    
+
+    private String imageUrl;
     
     private BigDecimal price;
 
