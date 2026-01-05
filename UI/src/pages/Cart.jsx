@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import cartApi from "../apis/cartApi";
-import booksApi from "../apis/booksApi";
 import { useNavigate } from "react-router-dom";
 
 function Cart() {
   const [items, setItems] = useState([]);
+  const [cartTotal, setCartTotal] = useState(0);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -17,19 +17,9 @@ function Cart() {
 
   const fetchCart = async () => {
     try {
-      const res = await cartApi.get("/cart/items");
-
-      const enrichedItems = await Promise.all(
-        res.data.map(async (item) => {
-          const bookRes = await booksApi.get(`/books/${item.bookId}`);
-          return {
-            ...item,
-            book: bookRes.data,
-          };
-        })
-      );
-
-      setItems(enrichedItems);
+      const res = await cartApi.get("/cart");
+      setItems(res.data.cartItems);
+      setCartTotal(res.data.cartTotal);
     } catch (err) {
       console.error("Error fetching cart items", err);
     }
@@ -37,7 +27,6 @@ function Cart() {
 
   const updateQuantity = async (item, newQuantity) => {
     try {
-      // optimistic UI update
       setItems((prev) =>
         prev
           .map((i) =>
@@ -50,6 +39,9 @@ function Cart() {
         id: item.id,
         quantity: newQuantity,
       });
+      
+      fetchCart();
+
     } catch (err) {
       console.error("Error updating quantity", err);
       fetchCart(); // fallback if something goes wrong
@@ -65,13 +57,14 @@ function Cart() {
       {items.map((item) => (
         <div key={item.id} style={styles.row}>
           <img
-            src={`${import.meta.env.VITE_API_BOOKS_URL}${item.book.imageUrl}`}
-            alt={item.book.title}
+            src={`${import.meta.env.VITE_API_BOOKS_URL}${item.imageUrl}`}
+            alt={item.title}
             style={styles.image}
           />
 
           <div style={styles.details}>
-            <h4>{item.book.title}</h4>
+            <h4>{item.title}</h4>
+            <p>₹{item.price}</p>
 
             <div style={styles.quantityBox}>
               <button
@@ -93,6 +86,14 @@ function Cart() {
           </div>
         </div>
       ))}
+
+      {items.length > 0 && (
+        <div style={styles.totalBox}>
+          <h3>Total: ₹{cartTotal}</h3>
+          <button style={styles.checkoutBtn}>Checkout</button>
+        </div>
+      )}
+
     </div>
   );
 }
@@ -133,6 +134,17 @@ const styles = {
     minWidth: "20px",
     textAlign: "center",
     fontWeight: "bold",
+  },
+  totalBox: {
+    marginTop: "20px",
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  checkoutBtn: {
+    padding: "10px 20px",
+    fontSize: "16px",
+    cursor: "pointer",
   },
 };
 
