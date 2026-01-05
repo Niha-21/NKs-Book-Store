@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 import com.nksbookstore.cart.model.BookDTO;
 
-@FeignClient(name = "book-service", url = "${book.service.url}")
+@FeignClient(name = "book-service")
 public interface BookClient {
 
     @GetMapping("/books/{bookId}")
