@@ -1,14 +1,13 @@
 package com.nksbookstore.order.client;
 
-import com.nksbookstore.order.model.CartItemDTO;
+import com.nksbookstore.order.model.CartResponseDTO;
+
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
-
-import java.util.List;
 
 @FeignClient(name = "cart-service")
 public interface CartClient {
 
-    @GetMapping("/cart/items")
-    List<CartItemDTO> getCartItems();
+    @GetMapping("/cart")
+    CartResponseDTO getCart();
 }

@@ -1,6 +1,7 @@
 package com.nksbookstore.order.service.impl;
 
 import com.nksbookstore.order.model.CartItemDTO;
+import com.nksbookstore.order.model.CartResponseDTO;
 import com.nksbookstore.order.model.OrderItemResponseDTO;
 import com.nksbookstore.order.model.OrderResponseDTO;
 import com.nksbookstore.order.client.CartClient;
@@ -31,21 +32,24 @@ public class OrderServiceImpl implements OrderService {
     @Transactional
     public OrderResponseDTO createOrder() {
         
-        List<CartItemDTO> cartItems = cartClient.getCartItems();
+        CartResponseDTO cartResponseDTO = null;
+        cartResponseDTO = cartClient.getCart();
 
-        if (cartItems.isEmpty()) {
+        if (cartResponseDTO == null) {
             throw new IllegalStateException("Cart is empty, cannot create order");
         }
 
-        BigDecimal totalAmount = cartItems.stream()
-            .map(item -> item.getPrice().multiply(BigDecimal.valueOf(item.getQuantity())))
-            .reduce(BigDecimal.ZERO, BigDecimal::add);
+        List<CartItemDTO> cartItems = cartResponseDTO.getCartItems();
+
+        // BigDecimal totalAmount = cartItems.stream()
+        //     .map(item -> item.getPrice().multiply(BigDecimal.valueOf(item.getQuantity())))
+        //     .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         Long userId = Long.parseLong(getLoggedInUserId());
 
         Order order = new Order();
         order.setUserId(userId);
-        order.setTotalAmount(totalAmount);
+        order.setTotalAmount(cartResponseDTO.getCartTotal());
         order.setStatus(OrderStatus.CREATED);
 
         List<OrderItem> orderItems = cartItems.stream()
