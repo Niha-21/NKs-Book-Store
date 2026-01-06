@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import cartApi from "../apis/cartApi";
+import orderApi from "../apis/orderApi";
 import { useNavigate } from "react-router-dom";
 
 function Cart() {
@@ -48,6 +49,17 @@ function Cart() {
     }
   };
 
+  const checkout = async () => {
+    try {
+      await orderApi.post("/orders");
+      navigate("/orders");
+    } catch (err) {
+      console.error("Checkout failed", err);
+      alert("Unable to place order");
+    }
+  };
+
+
   return (
     <div style={styles.container}>
       <h2>Your Cart</h2>
@@ -90,7 +102,7 @@ function Cart() {
       {items.length > 0 && (
         <div style={styles.totalBox}>
           <h3>Total: ₹{cartTotal}</h3>
-          <button style={styles.checkoutBtn}>Checkout</button>
+          <button style={styles.checkoutBtn} onClick={checkout}>Checkout</button>
         </div>
       )}
 
