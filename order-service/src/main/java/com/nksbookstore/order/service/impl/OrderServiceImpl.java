@@ -95,7 +95,8 @@ public class OrderServiceImpl implements OrderService {
         dto.setUserId(order.getUserId());
         dto.setTotalAmount(order.getTotalAmount());
         dto.setStatus(order.getStatus());
-
+        dto.setCreatedAt(order.getCreatedAt());
+        
         List<OrderItemResponseDTO> items = order.getOrderItems()
                 .stream()
                 .map(this::mapToOrderItemResponse)

@@ -11,4 +11,5 @@ public class OrderItemResponseDTO {
     private Integer quantity;
     private BigDecimal price;
     private BigDecimal subTotal;
+    
 }

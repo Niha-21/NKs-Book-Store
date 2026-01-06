@@ -1,6 +1,7 @@
 package com.nksbookstore.order.model;
 
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.util.List;
 
 import com.nksbookstore.order.entity.OrderStatus;
@@ -15,5 +16,6 @@ public class OrderResponseDTO {
     private BigDecimal totalAmount;
     private OrderStatus status;
     private List<OrderItemResponseDTO> items;
+    private Instant createdAt;
 
 }
