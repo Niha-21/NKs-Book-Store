@@ -7,6 +7,7 @@ import Register from "./pages/Register";
 import Books from "./pages/Books";
 import Cart from "./pages/Cart";
 import Orders from "./pages/Orders";
+import OrderDetails from "./pages/OrderDetails";
 
 
 ReactDOM.createRoot(document.getElementById('root')).render(
@@ -17,6 +18,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
       <Route path="/home" element={<Books />} />
       <Route path="/cart" element={<Cart />} />
       <Route path="/orders" element={<Orders />} />
+      <Route path="/orders/:orderId" element={<OrderDetails />} />
     </Routes>
   </BrowserRouter>
 )

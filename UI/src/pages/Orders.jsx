@@ -30,33 +30,37 @@ function Orders() {
       {orders.length === 0 && <p>No orders placed yet</p>}
 
       {orders.map((order) => (
-        <div key={order.orderId} style={styles.orderCard}>
-          <div style={styles.orderHeader}>
+        <div
+            key={order.orderId}
+            style={{ ...styles.orderCard, cursor: "pointer" }} 
+            onClick={() => navigate(`/orders/${order.orderId}`)} 
+        >
+            <div style={styles.orderHeader}>
             <span><b>Order #{order.orderId}</b></span>
             <span>Status: {order.status}</span>
-          </div>
+            </div>
 
-          <div>
+            <div>
             {order.items.map((item, idx) => (
-              <div key={idx} style={styles.itemRow}>
+                <div key={idx} style={styles.itemRow}>
                 <span>{item.bookName}</span>
                 <span>
-                  ₹{item.price} × {item.quantity}
+                    ₹{item.price} × {item.quantity}
                 </span>
-              </div>
+                </div>
             ))}
-          </div>
+            </div>
 
-          <div style={styles.orderFooter}>
+            <div style={styles.orderFooter}>
             <span>
-              Total: <b>₹{order.totalAmount}</b>
+                Total: <b>₹{order.totalAmount}</b>
             </span>
             <span style={styles.date}>
-              {new Date(order.createdAt).toLocaleDateString()}
+                {new Date(order.createdAt).toLocaleDateString()}
             </span>
-          </div>
+            </div>
         </div>
-      ))}
+        ))}
     </div>
   );
 }
