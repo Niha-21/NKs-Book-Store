@@ -2,13 +2,18 @@ package com.nksbookstore.cart.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
+
+import jakarta.validation.ConstraintViolationException;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
+@Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -53,6 +58,42 @@ public class GlobalExceptionHandler {
     public ResponseEntity<?> handleCartItemNotFound(Exception ex, WebRequest req) {
         return new ResponseEntity<>(buildError(HttpStatus.NOT_FOUND, ex.getMessage(), req),
                 HttpStatus.NOT_FOUND);
+    }
+
+    // Handle Unauthorized Exception
+    @ExceptionHandler(UnauthorizedException.class)
+    public ResponseEntity<?> handleUnauthorizedException(Exception ex, WebRequest req) {
+        return new ResponseEntity<>(buildError(HttpStatus.UNAUTHORIZED, ex.getMessage(), req),
+                HttpStatus.UNAUTHORIZED);
+    }
+
+    // Handle Book Not Found Exception
+    @ExceptionHandler(BookNotFoundException.class)
+    public ResponseEntity<?> handleBookNotFound(Exception ex, WebRequest req) {
+        return new ResponseEntity<>(buildError(HttpStatus.NOT_FOUND, ex.getMessage(), req),
+                HttpStatus.NOT_FOUND);
+    }
+    
+    // Handle Book Service Unavailable Exception 
+    @ExceptionHandler(BookServiceUnavailableException.class)
+    public ResponseEntity<?> handleBookServiceUnavailable(Exception ex, WebRequest req) {
+        log.error("Book service failure", ex);
+        return new ResponseEntity<>(buildError(HttpStatus.SERVICE_UNAVAILABLE, ex.getMessage(), req),
+                HttpStatus.SERVICE_UNAVAILABLE);
+    }
+
+    // Handle Constraint Violation Exception
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<?> handleConstraintViolation(ConstraintViolationException ex, WebRequest req) {
+        return new ResponseEntity<>(buildError(HttpStatus.BAD_REQUEST, ex.getMessage(), req),
+                HttpStatus.BAD_REQUEST);
+    }
+    
+    // Handle Method Argument Not Valid Exception
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<?> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, WebRequest req) {
+        return new ResponseEntity<>(buildError(HttpStatus.BAD_REQUEST, ex.getMessage(), req),
+                HttpStatus.BAD_REQUEST);
     }
 
     // Handle ALL exceptions

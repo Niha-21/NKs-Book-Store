@@ -12,8 +12,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.nksbookstore.cart.entity.Cart;
 import com.nksbookstore.cart.entity.CartItem;
+import com.nksbookstore.cart.exception.BookNotFoundException;
+import com.nksbookstore.cart.exception.BookServiceUnavailableException;
 import com.nksbookstore.cart.exception.CartItemNotFoundException;
 import com.nksbookstore.cart.exception.CartNotFoundException;
+import com.nksbookstore.cart.exception.UnauthorizedException;
 import com.nksbookstore.cart.model.CartItemDTO;
 import com.nksbookstore.cart.model.CartResponseDTO;
 import com.nksbookstore.cart.model.BookDTO;
@@ -26,7 +29,9 @@ import feign.FeignException;
 import com.nksbookstore.cart.client.BookClient;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class CartServiceImpl implements CartService {
@@ -65,9 +70,11 @@ public class CartServiceImpl implements CartService {
     }
 
     private Cart getOrCreateCart(Long userId) {
-
+        
+        log.info("Fetching cart for userId={}", userId);
         return cartRepository.findByUserId(userId)
                 .orElseGet(() -> {
+                    log.info("Creating new cart for userId={}", userId);
                     Cart newCart = new Cart();
                     newCart.setUserId(userId);
                     return cartRepository.save(newCart);
@@ -103,8 +110,9 @@ public class CartServiceImpl implements CartService {
 
     @Override
     public CartResponseDTO getCart() {
-
+        
         Long userId = Long.parseLong(getLoggedInUserId());
+        log.info("Fetching cart for userId={}", userId);
 
         Cart cart = cartRepository.findByUserId(userId)
                 .orElseThrow(() -> new CartNotFoundException("Cart not found"));
@@ -116,9 +124,18 @@ public class CartServiceImpl implements CartService {
                         try {
                             BookDTO book = bookClient.getBookById(cartItem.getBookId());
                             return convertEntityToDTO(cartItem, book);
-                        } catch (FeignException.NotFound e) {
-                            // Book not found, skip item
-                            return null;
+                        } catch(FeignException.NotFound e) {
+                            log.error("Book service call failed: status={}, message={}",
+                            e.status(), e.getMessage());
+                            throw new BookNotFoundException("Book Not Found");
+                        } catch (FeignException.Unauthorized | FeignException.Forbidden e) {
+                            log.error("Book service call failed: status={}, message={}",
+                            e.status(), e.getMessage());
+                            throw new UnauthorizedException("Unauthorized to access book-service");
+                        } catch (FeignException e) {
+                            log.error("Book service call failed: status={}, message={}",
+                            e.status(), e.getMessage());
+                            throw new BookServiceUnavailableException("Book service unavailable");
                         }
                     })
                     .filter(Objects::nonNull)
@@ -151,7 +168,7 @@ public class CartServiceImpl implements CartService {
             cart.getCartItems().remove(itemToRemove);
 
         } else {
-            throw new CartItemNotFoundException("Item not found");
+            throw new CartItemNotFoundException(" Cart Item not found");
         }
     
     }
@@ -185,6 +202,12 @@ public class CartServiceImpl implements CartService {
 
     private String getLoggedInUserId() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        
+        if(auth == null || auth.getPrincipal() == null) {               
+            log.error("User not authenticated => {}", auth);
+            throw new UnauthorizedException("User not authenticated");
+        }
+
         return auth.getPrincipal().toString();
     }
     
