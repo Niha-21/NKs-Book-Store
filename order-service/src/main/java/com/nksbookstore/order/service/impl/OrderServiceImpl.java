@@ -13,6 +13,7 @@ import com.nksbookstore.order.exception.CartServiceUnavailableException;
 import com.nksbookstore.order.exception.OrderNotFoundException;
 import com.nksbookstore.order.exception.UnauthorizedException;
 import com.nksbookstore.order.repository.OrderRepository;
+import com.nksbookstore.order.service.CartClientService;
 import com.nksbookstore.order.service.OrderService;
 
 import feign.FeignException;
@@ -20,6 +21,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -34,7 +36,9 @@ import java.util.List;
 public class OrderServiceImpl implements OrderService {
 
     private final OrderRepository orderRepository;
-    private final CartClient cartClient;
+    
+    private final CartClientService cartClientService;
+
 
     @Override
     @Transactional
@@ -46,7 +50,7 @@ public class OrderServiceImpl implements OrderService {
         CartResponseDTO cartResponseDTO = null;
 
         try {
-            cartResponseDTO =  cartClient.getCart();
+            cartResponseDTO =  cartClientService.getCart();
         } catch(FeignException.NotFound e) {
             log.error("Cart service call failed: status={}, message={}",
               e.status(), e.getMessage());
@@ -96,7 +100,7 @@ public class OrderServiceImpl implements OrderService {
 
         try {
             //clearing cart
-            cartClient.clearCart();
+            cartClientService.clearCart();
         } catch(FeignException e) {
             log.warn("Order {} created but failed to clear cart", savedOrder.getId(), e);
         }
