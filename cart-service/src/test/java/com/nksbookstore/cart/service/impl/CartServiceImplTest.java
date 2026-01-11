@@ -1,6 +1,7 @@
 package com.nksbookstore.cart.service.impl;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 import java.math.BigDecimal;
@@ -20,6 +21,7 @@ import com.nksbookstore.cart.exception.*;
 import com.nksbookstore.cart.model.*;
 import com.nksbookstore.cart.repository.CartItemRepository;
 import com.nksbookstore.cart.repository.CartRepository;
+import com.nksbookstore.cart.service.BookClientService;
 
 import feign.FeignException;
 
@@ -33,7 +35,7 @@ class CartServiceImplTest {
     private CartItemRepository cartItemRepository;
 
     @Mock
-    private BookClient bookClient;
+    private BookClientService bookClientService;
 
     @InjectMocks
     private CartServiceImpl cartService;
@@ -155,7 +157,7 @@ class CartServiceImplTest {
         when(cartRepository.findByUserId(USER_ID)).thenReturn(Optional.of(cart));
 
         BookDTO book = new BookDTO(10L, "Book", "img", BigDecimal.valueOf(100));
-        when(bookClient.getBookById(10L)).thenReturn(book);
+        when(bookClientService.getBookById(10L)).thenReturn(book);
 
         CartResponseDTO response = cartService.getCart();
 
@@ -173,7 +175,7 @@ class CartServiceImplTest {
         cart.getCartItems().add(item);
 
         when(cartRepository.findByUserId(USER_ID)).thenReturn(Optional.of(cart));
-        when(bookClient.getBookById(10L)).thenThrow(mock(FeignException.NotFound.class));
+        when(bookClientService.getBookById(10L)).thenThrow(mock(BookNotFoundException.class));
 
         assertThrows(BookNotFoundException.class, () -> cartService.getCart());
     }
@@ -188,8 +190,8 @@ class CartServiceImplTest {
         cart.getCartItems().add(item);
 
         when(cartRepository.findByUserId(USER_ID)).thenReturn(Optional.of(cart));
-        when(bookClient.getBookById(10L))
-                .thenThrow(mock(FeignException.Unauthorized.class));
+        when(bookClientService.getBookById(10L))
+                .thenThrow(mock(UnauthorizedException.class));
 
         assertThrows(UnauthorizedException.class, () -> cartService.getCart());
     }

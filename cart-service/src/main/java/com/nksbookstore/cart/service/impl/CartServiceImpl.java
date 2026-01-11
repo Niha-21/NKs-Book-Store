@@ -12,8 +12,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.nksbookstore.cart.entity.Cart;
 import com.nksbookstore.cart.entity.CartItem;
-import com.nksbookstore.cart.exception.BookNotFoundException;
-import com.nksbookstore.cart.exception.BookServiceUnavailableException;
 import com.nksbookstore.cart.exception.CartItemNotFoundException;
 import com.nksbookstore.cart.exception.CartNotFoundException;
 import com.nksbookstore.cart.exception.UnauthorizedException;
@@ -22,11 +20,8 @@ import com.nksbookstore.cart.model.CartResponseDTO;
 import com.nksbookstore.cart.model.BookDTO;
 import com.nksbookstore.cart.repository.CartItemRepository;
 import com.nksbookstore.cart.repository.CartRepository;
+import com.nksbookstore.cart.service.BookClientService;
 import com.nksbookstore.cart.service.CartService;
-
-import feign.FeignException;
-
-import com.nksbookstore.cart.client.BookClient;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -38,7 +33,7 @@ public class CartServiceImpl implements CartService {
 
     private final CartRepository cartRepository;
     private final CartItemRepository cartItemRepository;
-    private final BookClient bookClient;
+    private final BookClientService bookClientService;
 
     @Override
     @Transactional
@@ -121,22 +116,8 @@ public class CartServiceImpl implements CartService {
                     cart.getCartItems()
                     .stream()
                     .map(cartItem -> {
-                        try {
-                            BookDTO book = bookClient.getBookById(cartItem.getBookId());
-                            return convertEntityToDTO(cartItem, book);
-                        } catch(FeignException.NotFound e) {
-                            log.error("Book service call failed: status={}, message={}",
-                            e.status(), e.getMessage());
-                            throw new BookNotFoundException("Book Not Found");
-                        } catch (FeignException.Unauthorized | FeignException.Forbidden e) {
-                            log.error("Book service call failed: status={}, message={}",
-                            e.status(), e.getMessage());
-                            throw new UnauthorizedException("Unauthorized to access book-service");
-                        } catch (FeignException e) {
-                            log.error("Book service call failed: status={}, message={}",
-                            e.status(), e.getMessage());
-                            throw new BookServiceUnavailableException("Book service unavailable");
-                        }
+                            BookDTO book = bookClientService.getBookById(cartItem.getBookId());
+                            return convertEntityToDTO(cartItem, book);                        
                     })
                     .filter(Objects::nonNull)
                     .toList();
