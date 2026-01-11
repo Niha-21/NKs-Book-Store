@@ -101,7 +101,6 @@ public class OrderServiceImpl implements OrderService {
             log.warn("Order {} created but failed to clear cart", savedOrder.getId(), e);
         }
 
-        
         log.info("Created order for userId={}", userId);
         return mapToOrderResponse(savedOrder);
     }
