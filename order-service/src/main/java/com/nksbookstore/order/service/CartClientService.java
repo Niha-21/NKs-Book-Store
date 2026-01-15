@@ -1,9 +1,11 @@
 package com.nksbookstore.order.service;
 
 import com.nksbookstore.order.client.CartClient;
+import com.nksbookstore.order.common.event.ClearCartEvent;
 import com.nksbookstore.order.exception.CartEmptyException;
 import com.nksbookstore.order.exception.CartServiceUnavailableException;
 import com.nksbookstore.order.exception.UnauthorizedException;
+import com.nksbookstore.order.kafka.ClearCartProducer;
 import com.nksbookstore.order.model.CartResponseDTO;
 
 import feign.FeignException;
@@ -22,6 +24,7 @@ import org.springframework.stereotype.Service;
 public class CartClientService {
 
     private final CartClient cartClient;
+    private final ClearCartProducer clearCartProducer;
 
     private static final String CART_CB = "cartService";
 
@@ -31,7 +34,7 @@ public class CartClientService {
     }
 
     @CircuitBreaker(name = CART_CB, fallbackMethod = "clearCartFallback")
-    public void clearCart() {
+    public void clearCart(Long orderId, Long userId) {
         cartClient.clearCart();
     }
 
@@ -63,8 +66,12 @@ public class CartClientService {
         // return new CartResponseDTO(List.of(), BigDecimal.ZERO);
     }
 
-    public void clearCartFallback(Throwable ex) {
+    public void clearCartFallback(Long orderId, Long userId, Throwable ex) {
         log.error("Failed to clear cart, will retry asynchronously", ex);
-        // to add retry logic later
+        // retry logic
+        clearCartProducer.publish(
+            new ClearCartEvent(orderId, userId)
+        );
     }
+
 }

@@ -85,7 +85,7 @@ public class OrderServiceImpl implements OrderService {
         Order savedOrder = orderRepository.save(order);
 
         //clearing cart
-        cartClientService.clearCart();
+        cartClientService.clearCart(savedOrder.getId(), savedOrder.getUserId());
 
         log.info("Created order for userId={}", userId);
         return mapToOrderResponse(savedOrder);

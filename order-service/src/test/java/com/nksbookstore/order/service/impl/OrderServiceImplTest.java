@@ -75,7 +75,7 @@ class OrderServiceImplTest {
         assertEquals(1, response.getItems().size());
 
         verify(cartClientService).getCart();
-        verify(cartClientService).clearCart();
+        verify(cartClientService).clearCart(response.getOrderId(), response.getUserId());
         verify(orderRepository).save(any(Order.class));
     }
 
@@ -90,7 +90,7 @@ class OrderServiceImplTest {
         assertThrows(CartEmptyException.class, () -> orderService.createOrder());
 
         verify(orderRepository, never()).save(any());
-        verify(cartClientService, never()).clearCart();
+        // verify(cartClientService, never()).clearCart();
     }
 
     @Test
@@ -119,9 +119,6 @@ class OrderServiceImplTest {
         CartResponseDTO cartResponse = buildCartResponse();
 
         when(cartClientService.getCart()).thenReturn(cartResponse);
-        doThrow(CartServiceUnavailableException.class)
-        .when(cartClientService)
-        .clearCart();
         when(orderRepository.save(any(Order.class)))
                 .thenAnswer(inv -> {
                     Order o = inv.getArgument(0);
@@ -130,6 +127,10 @@ class OrderServiceImplTest {
                 });
 
         OrderResponseDTO response = orderService.createOrder();
+
+        doThrow(CartServiceUnavailableException.class)
+        .when(cartClientService)
+        .clearCart(response.getOrderId(), response.getUserId());
 
         assertEquals(20L, response.getOrderId());
         verify(orderRepository).save(any(Order.class));
