@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.nksbookstore.cart.entity.Cart;
 import com.nksbookstore.cart.entity.CartItem;
+import com.nksbookstore.cart.exception.BookNotFoundException;
 import com.nksbookstore.cart.exception.CartItemNotFoundException;
 import com.nksbookstore.cart.exception.CartNotFoundException;
 import com.nksbookstore.cart.exception.UnauthorizedException;
@@ -116,8 +117,13 @@ public class CartServiceImpl implements CartService {
                     cart.getCartItems()
                     .stream()
                     .map(cartItem -> {
+                        try {
                             BookDTO book = bookClientService.getBookById(cartItem.getBookId());
-                            return convertEntityToDTO(cartItem, book);                        
+                            return convertEntityToDTO(cartItem, book);   
+                        } catch(BookNotFoundException e) {
+                            log.error("Book not found. bookId={} | Proceeding with available books.", cartItem.getBookId());
+                            return null;
+                        }                     
                     })
                     .filter(Objects::nonNull)
                     .toList();
