@@ -166,18 +166,36 @@ class CartServiceImplTest {
     }
 
     @Test
-    void getCart_shouldThrowBookNotFoundException() {
+    void getCart_shouldNotThrowBookNotFoundException() {
+        
         CartItem item = new CartItem();
+        item.setId(1L);
         item.setBookId(10L);
+        item.setQuantity(2);
+
+        CartItem missingItem = new CartItem();
+        missingItem.setId(2L);
+        missingItem.setBookId(20L);
+        missingItem.setQuantity(1);
 
         Cart cart = new Cart();
         cart.setUserId(USER_ID);
         cart.getCartItems().add(item);
+        cart.getCartItems().add(missingItem);
+        item.setCart(cart);
+        missingItem.setCart(cart);
 
         when(cartRepository.findByUserId(USER_ID)).thenReturn(Optional.of(cart));
-        when(bookClientService.getBookById(10L)).thenThrow(mock(BookNotFoundException.class));
 
-        assertThrows(BookNotFoundException.class, () -> cartService.getCart());
+        BookDTO book = new BookDTO(10L, "Book", "img", BigDecimal.valueOf(100));
+        when(bookClientService.getBookById(10L)).thenReturn(book);
+
+        when(bookClientService.getBookById(20L)).thenThrow(mock(BookNotFoundException.class));
+        
+        CartResponseDTO response = cartService.getCart();
+        
+        assertEquals(1, response.getCartItems().size());
+        assertEquals(BigDecimal.valueOf(200), response.getCartTotal());
     }
 
     @Test
