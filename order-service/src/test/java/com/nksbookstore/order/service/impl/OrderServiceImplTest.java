@@ -12,6 +12,7 @@ import com.nksbookstore.order.model.CartItemDTO;
 import com.nksbookstore.order.model.CartResponseDTO;
 import com.nksbookstore.order.model.OrderResponseDTO;
 import com.nksbookstore.order.repository.OrderRepository;
+import com.nksbookstore.order.service.CartClientService;
 
 import feign.FeignException;
 import feign.Request;
@@ -37,7 +38,7 @@ class OrderServiceImplTest {
     private OrderRepository orderRepository;
 
     @Mock
-    private CartClient cartClient;
+    private CartClientService cartClientService;
 
     @InjectMocks
     private OrderServiceImpl orderService;
@@ -58,7 +59,7 @@ class OrderServiceImplTest {
     void createOrder_success() {
         CartResponseDTO cartResponse = buildCartResponse();
 
-        when(cartClient.getCart()).thenReturn(cartResponse);
+        when(cartClientService.getCart()).thenReturn(cartResponse);
         when(orderRepository.save(any(Order.class)))
                 .thenAnswer(inv -> {
                     Order o = inv.getArgument(0);
@@ -73,8 +74,8 @@ class OrderServiceImplTest {
         assertEquals(OrderStatus.CREATED, response.getStatus());
         assertEquals(1, response.getItems().size());
 
-        verify(cartClient).getCart();
-        verify(cartClient).clearCart();
+        verify(cartClientService).getCart();
+        verify(cartClientService).clearCart();
         verify(orderRepository).save(any(Order.class));
     }
 
@@ -84,31 +85,31 @@ class OrderServiceImplTest {
         cartResponse.setCartItems(List.of());
         cartResponse.setCartTotal(BigDecimal.ZERO);
 
-        when(cartClient.getCart()).thenReturn(cartResponse);
+        when(cartClientService.getCart()).thenReturn(cartResponse);
 
         assertThrows(CartEmptyException.class, () -> orderService.createOrder());
 
         verify(orderRepository, never()).save(any());
-        verify(cartClient, never()).clearCart();
+        verify(cartClientService, never()).clearCart();
     }
 
     @Test
     void createOrder_cartNotFound_throwsCartEmptyException() {
-        when(cartClient.getCart()).thenThrow(feignNotFound());
+        when(cartClientService.getCart()).thenThrow(CartEmptyException.class);
 
         assertThrows(CartEmptyException.class, () -> orderService.createOrder());
     }
 
     @Test
     void createOrder_unauthorizedCartAccess() {
-        when(cartClient.getCart()).thenThrow(feignUnauthorized());
+        when(cartClientService.getCart()).thenThrow(UnauthorizedException.class);
 
         assertThrows(UnauthorizedException.class, () -> orderService.createOrder());
     }
 
     @Test
     void createOrder_cartServiceDown() {
-        when(cartClient.getCart()).thenThrow(feignServiceUnavailable());
+        when(cartClientService.getCart()).thenThrow(CartServiceUnavailableException.class);
 
         assertThrows(CartServiceUnavailableException.class, () -> orderService.createOrder());
     }
@@ -117,9 +118,9 @@ class OrderServiceImplTest {
     void createOrder_clearCartFails_orderStillCreated() {
         CartResponseDTO cartResponse = buildCartResponse();
 
-        when(cartClient.getCart()).thenReturn(cartResponse);
-        doThrow(feignServiceUnavailable())
-        .when(cartClient)
+        when(cartClientService.getCart()).thenReturn(cartResponse);
+        doThrow(CartServiceUnavailableException.class)
+        .when(cartClientService)
         .clearCart();
         when(orderRepository.save(any(Order.class)))
                 .thenAnswer(inv -> {
@@ -203,18 +204,4 @@ class OrderServiceImplTest {
         return order;
     }
 
-    private FeignException feignNotFound() {
-        return new FeignException.NotFound(
-                "not found", mock(Request.class), null, null);
-    }
-
-    private FeignException feignUnauthorized() {
-        return new FeignException.Unauthorized(
-                "unauthorized", mock(Request.class), null, null);
-    }
-
-    private FeignException feignServiceUnavailable() {
-        return new FeignException.ServiceUnavailable(
-                "down", mock(Request.class), null, null);
-    }
 }

@@ -49,21 +49,7 @@ public class OrderServiceImpl implements OrderService {
 
         CartResponseDTO cartResponseDTO = null;
 
-        try {
-            cartResponseDTO =  cartClientService.getCart();
-        } catch(FeignException.NotFound e) {
-            log.error("Cart service call failed: status={}, message={}",
-              e.status(), e.getMessage());
-            throw new CartEmptyException("Cart is empty");
-        } catch (FeignException.Unauthorized | FeignException.Forbidden e) {
-            log.error("Cart service call failed: status={}, message={}",
-              e.status(), e.getMessage());
-            throw new UnauthorizedException("Unauthorized to access cart");
-        } catch (FeignException e) {
-            log.error("Cart service call failed: status={}, message={}",
-              e.status(), e.getMessage());
-            throw new CartServiceUnavailableException("Cart service unavailable");
-        }
+        cartResponseDTO =  cartClientService.getCart();
 
         List<CartItemDTO> cartItems = cartResponseDTO.getCartItems();
         
@@ -98,12 +84,8 @@ public class OrderServiceImpl implements OrderService {
 
         Order savedOrder = orderRepository.save(order);
 
-        try {
-            //clearing cart
-            cartClientService.clearCart();
-        } catch(FeignException e) {
-            log.warn("Order {} created but failed to clear cart", savedOrder.getId(), e);
-        }
+        //clearing cart
+        cartClientService.clearCart();
 
         log.info("Created order for userId={}", userId);
         return mapToOrderResponse(savedOrder);

@@ -1,8 +1,12 @@
 package com.nksbookstore.order.service;
 
 import com.nksbookstore.order.client.CartClient;
+import com.nksbookstore.order.exception.CartEmptyException;
+import com.nksbookstore.order.exception.CartServiceUnavailableException;
+import com.nksbookstore.order.exception.UnauthorizedException;
 import com.nksbookstore.order.model.CartResponseDTO;
 
+import feign.FeignException;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,7 +37,30 @@ public class CartClientService {
 
     public CartResponseDTO getCartFallback(Throwable ex) {
         log.error("Cart service unavailable, fallback triggered", ex);
-        return new CartResponseDTO(List.of(), BigDecimal.ZERO);
+
+        if(ex instanceof FeignException.NotFound e) {
+
+            log.error("Cart Empty. status={}, message={}",
+            e.status(), e.getMessage());
+            throw new CartEmptyException("Cart Empty");
+
+        } else if(ex instanceof FeignException e) {
+
+            log.error("Cart service call failed. status={}, message={}",
+            e.status(), e.getMessage());
+            if (e.status() == 401 || e.status() == 403) {
+                throw new UnauthorizedException("Unauthorized to access cart-service");           
+            }
+            throw new CartServiceUnavailableException("Cart service unavailable");
+
+        } else {
+
+            log.error("Cart Service Unavailable | Failed to get cart", ex);
+            throw new CartServiceUnavailableException("Cart service unavailable");
+        
+        }
+        
+        // return new CartResponseDTO(List.of(), BigDecimal.ZERO);
     }
 
     public void clearCartFallback(Throwable ex) {
