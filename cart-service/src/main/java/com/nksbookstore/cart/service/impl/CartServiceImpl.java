@@ -197,5 +197,16 @@ public class CartServiceImpl implements CartService {
 
         return auth.getPrincipal().toString();
     }
+
+    @Override
+    @Transactional
+    public void clearCartForUser(Long userId) {
+
+        Cart cart = cartRepository.findByUserId(userId)
+                .orElseThrow(() -> new CartNotFoundException("Cart not found for user"));
+
+        cart.getCartItems().clear();    
+        log.info("Cart cleared for userId={}", userId);
+    }
     
 }

@@ -14,5 +14,7 @@ public interface CartService {
     void clearCart();
 
     public void updateCartItemQuantity(CartItemDTO cartItem);
+
+    void clearCartForUser(Long userId);
     
 }
