@@ -67,7 +67,7 @@ public class CartClientService {
     }
 
     public void clearCartFallback(Long orderId, Long userId, Throwable ex) {
-        log.error("Failed to clear cart, will retry asynchronously", ex);
+        log.error("Clear cart failed, fallback triggered", ex);
         // retry logic
         clearCartProducer.publish(
             new ClearCartEvent(orderId, userId)
