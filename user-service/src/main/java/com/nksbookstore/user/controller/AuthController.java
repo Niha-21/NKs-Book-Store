@@ -10,8 +10,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.nksbookstore.user.model.AuthResponse;
 import com.nksbookstore.user.model.LoginRequest;
 import com.nksbookstore.user.model.LoginResponse;
+import com.nksbookstore.user.model.RefreshRequest;
 import com.nksbookstore.user.model.UserDTO;
 import com.nksbookstore.user.service.AuthService;
 import com.nksbookstore.user.service.UserService;
@@ -45,9 +47,21 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest request) {
-        String token = authService.login(request.username(), request.password());
-        return ResponseEntity.ok(new LoginResponse(token));
+    public ResponseEntity<AuthResponse> login(@RequestBody LoginRequest request) {
+        return ResponseEntity.ok(
+            authService.login(request.username(), request.password())
+        );
+    }
+
+    @PostMapping("/refresh")
+    public ResponseEntity<AuthResponse> refresh(@RequestBody RefreshRequest request) {
+        return ResponseEntity.ok(authService.refresh(request.getRefreshToken()));
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<String> logout(@RequestBody RefreshRequest request) {
+        authService.logout(request.getRefreshToken());
+        return ResponseEntity.ok("Logged out successfully");
     }
 
 }

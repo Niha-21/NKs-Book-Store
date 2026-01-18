@@ -21,7 +21,9 @@ public class JwtTokenProvider {
     
     @Value("${spring.app.jwtSecret}")
     private String jwtSecret; // using key from config
-    private final long jwtExpirationMs = 3600000; // 1 hour
+    
+    @Value("${spring.app.jwtExpirationMs}")
+    private long jwtExpirationMs; 
     
     private SecretKey getSigningKey() {
         byte[] keyBytes = Base64.getDecoder().decode(jwtSecret);
@@ -34,6 +36,16 @@ public class JwtTokenProvider {
         return Jwts.builder()
                 .setSubject(((CustomUserDetails) userPrincipal).getId().toString())
                 // .claim("userId", ((CustomUserDetails) userPrincipal).getId())
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + jwtExpirationMs))
+                .signWith(getSigningKey(), SignatureAlgorithm.HS512)
+                .compact();
+    }
+
+    public String generateToken(Long userId) {
+
+        return Jwts.builder()
+                .setSubject(userId.toString())
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + jwtExpirationMs))
                 .signWith(getSigningKey(), SignatureAlgorithm.HS512)
