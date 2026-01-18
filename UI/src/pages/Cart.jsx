@@ -8,6 +8,7 @@ function Cart() {
   const [items, setItems] = useState([]);
   const [cartTotal, setCartTotal] = useState(0);
   const navigate = useNavigate();
+  const [isCheckingOut, setIsCheckingOut] = useState(false);
 
   useEffect(() => {
     if (!localStorage.getItem("token")) {
@@ -52,11 +53,14 @@ function Cart() {
 
   const checkout = async () => {
     try {
+      if (isCheckingOut) return;      
+      setIsCheckingOut(true);
       await orderApi.post("/orders");
       navigate("/orders");
     } catch (err) {
       console.error("Checkout failed", err);
       alert("Unable to place order");
+      setIsCheckingOut(true);
     }
   };
 
@@ -105,7 +109,8 @@ function Cart() {
       {items.length > 0 && (
         <div style={styles.totalBox}>
           <h3>Total: ₹{cartTotal}</h3>
-          <button style={styles.checkoutBtn} onClick={checkout}>Checkout</button>
+          <button style={styles.checkoutBtn} onClick={checkout} disabled={isCheckingOut}>
+          {isCheckingOut ? "Placing Order..." : "Checkout"} </button>
         </div>
       )}
 
