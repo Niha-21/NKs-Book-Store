@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import cartApi from "../apis/cartApi";
 import orderApi from "../apis/orderApi";
 import { useNavigate } from "react-router-dom";
+import Header from "../components/Header";
 
 function Cart() {
   const [items, setItems] = useState([]);
@@ -61,10 +62,12 @@ function Cart() {
 
 
   return (
+    <>
+      <Header />
     <div style={styles.container}>
-      <h2>Your Cart</h2>
+      <h2 style={styles.headline}>My Cart</h2>
 
-      {items.length === 0 && <p>Cart is empty</p>}
+      {items.length === 0 && <p>Cart Empty. No items!</p>}
 
       {items.map((item) => (
         <div key={item.id} style={styles.row}>
@@ -107,12 +110,19 @@ function Cart() {
       )}
 
     </div>
+    </>
   );
 }
 
 const styles = {
   container: {
     padding: "30px",
+  },
+  headline: {
+    color: "#17213a",
+    fontWeight: "bold",
+    textAlign: "center",
+    // fontStyle: "italic",
   },
   row: {
     display: "flex",
@@ -129,18 +139,24 @@ const styles = {
   },
   details: {
     flex: 1,
+    color: "#17213a",
+    fontWeight: "bold",
   },
   quantityBox: {
     display: "flex",
     alignItems: "center",
     gap: "10px",
     marginTop: "8px",
+    color: "#17213a",
   },
   qtyBtn: {
     width: "30px",
     height: "30px",
     fontSize: "18px",
     cursor: "pointer",
+    color: "#17213a",
+    backgroundColor: "#9df43f",
+    border: "none",
   },
   qty: {
     minWidth: "20px",
@@ -157,6 +173,10 @@ const styles = {
     padding: "10px 20px",
     fontSize: "16px",
     cursor: "pointer",
+    backgroundColor: "#9df43f",
+    borderRadius: "6px",
+    border: "none",
+    color: "#17213a",
   },
 };
 

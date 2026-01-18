@@ -8,7 +8,8 @@ import Books from "./pages/Books";
 import Cart from "./pages/Cart";
 import Orders from "./pages/Orders";
 import OrderDetails from "./pages/OrderDetails";
-
+import Profile from "./pages/Profile";
+import PrivateRoute from "./components/PrivateRoute";
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <BrowserRouter>
@@ -16,9 +17,18 @@ ReactDOM.createRoot(document.getElementById('root')).render(
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
       <Route path="/home" element={<Books />} />
-      <Route path="/cart" element={<Cart />} />
-      <Route path="/orders" element={<Orders />} />
-      <Route path="/orders/:orderId" element={<OrderDetails />} />
+      <Route path="/cart" element={<PrivateRoute>
+                                    <Cart />
+                                    </PrivateRoute>} />
+      <Route path="/profile" element={<PrivateRoute>
+                                      <Profile />
+                                      </PrivateRoute>} />
+      <Route path="/orders" element={<PrivateRoute>
+                                      <Orders />
+                                      </PrivateRoute>} />
+      <Route path="/orders/:orderId" element={<PrivateRoute>
+                                              <OrderDetails />
+                                              </PrivateRoute>} />
     </Routes>
   </BrowserRouter>
 )

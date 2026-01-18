@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import orderApi from "../apis/orderApi";
 import { useNavigate } from "react-router-dom";
+import Header from "../components/Header";
 
 function Orders() {
   const [orders, setOrders] = useState([]);
@@ -24,19 +25,21 @@ function Orders() {
   };
 
   return (
+    <>
+    <Header />
     <div style={styles.container}>
-      <h2>My Orders</h2>
+      <h2 style={styles.headline}>Orders</h2>
 
       {orders.length === 0 && <p>No orders placed yet</p>}
 
-      {orders.map((order) => (
+      {orders.map((order, index) => (
         <div
             key={order.orderId}
             style={{ ...styles.orderCard, cursor: "pointer" }} 
             onClick={() => navigate(`/orders/${order.orderId}`)} 
         >
             <div style={styles.orderHeader}>
-            <span><b>Order #{order.orderId}</b></span>
+            <span><b>Order #{index + 1}</b></span>
             <span>Status: {order.status}</span>
             </div>
 
@@ -62,12 +65,20 @@ function Orders() {
         </div>
         ))}
     </div>
+    </>
   );
 }
 
 const styles = {
   container: {
     padding: "30px",
+  },
+  headline: {
+    color: "#17213a",
+    fontWeight: "bold",
+    fontSize: "25px",
+    // fontStyle: "italic",
+    padding: "20px 0",
   },
   orderCard: {
     border: "1px solid #ddd",

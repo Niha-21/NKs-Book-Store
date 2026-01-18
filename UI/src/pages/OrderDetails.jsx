@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import orderApi from "../apis/orderApi";
+import Header from "../components/Header";
 
 function OrderDetails() {
   const { orderId } = useParams();
@@ -24,12 +25,11 @@ function OrderDetails() {
   if (!order) return <p>Loading order...</p>;
 
   return (
+    <>
+    <Header/>
     <div style={styles.container}>
-      <button onClick={() => navigate("/orders")} style={styles.backBtn}>
-        ← Back to Orders
-      </button>
 
-      <h2>Order #{order.orderId}</h2>
+      <h2 style={styles.headline}>Order placed on {new Date(order.createdAt).toLocaleDateString()}</h2>
 
       <div style={styles.meta}>
         <span>
@@ -68,6 +68,7 @@ function OrderDetails() {
         <h3>Total: ₹{order.totalAmount}</h3>
       </div>
     </div>
+    </>
   );
 }
 
@@ -77,9 +78,10 @@ const styles = {
     maxWidth: "900px",
     margin: "0 auto",
   },
-  backBtn: {
-    marginBottom: "20px",
-    cursor: "pointer",
+  headline: {
+    color: "#17213a",
+    fontWeight: "bold",
+    // fontStyle: "italic",
   },
   meta: {
     display: "flex",
@@ -105,14 +107,20 @@ const styles = {
     borderRadius: "6px",
   },
   details: {
+    color: "#17213a",
     flex: 1,
   },
   subtotal: {
+    color: "#17213a",
     fontWeight: "bold",
   },
   total: {
     textAlign: "right",
     marginTop: "20px",
+    color: "#17213a",
+    backgroundColor: "#9df43f",
+    padding: "2px 10px",
+    borderRadius: "6px",
   },
 };
 
