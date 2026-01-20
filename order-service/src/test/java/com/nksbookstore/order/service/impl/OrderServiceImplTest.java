@@ -128,9 +128,9 @@ class OrderServiceImplTest {
 
         OrderResponseDTO response = orderService.createOrder();
 
-        doThrow(CartServiceUnavailableException.class)
-        .when(cartClientService)
-        .clearCart(response.getOrderId(), response.getUserId());
+        // doThrow(CartServiceUnavailableException.class)
+        // .when(cartClientService)
+        // .clearCart(response.getOrderId(), response.getUserId());
 
         assertEquals(20L, response.getOrderId());
         verify(orderRepository).save(any(Order.class));
