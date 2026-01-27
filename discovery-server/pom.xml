@@ -11,7 +11,6 @@
 	<groupId>com.nksbookstore</groupId>
 	<artifactId>discovery-server</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<packaging>war</packaging>
 	<name>discovery-server</name>
 	<description>Discovery Server for NKS Book Store</description>
 	<url/>
