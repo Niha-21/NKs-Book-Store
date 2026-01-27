@@ -61,7 +61,7 @@ class AuthServiceImplTest {
         User user = new User();
         user.setId(userId);
 
-        
+        SecurityContextHolder.getContext().setAuthentication(authentication);
         when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
                 .thenReturn(authentication);
                 
