@@ -55,12 +55,63 @@ services:
       - nksbookstore-net
     command: redis-server --appendonly yes
 
-  # discovery-service:
-  #   image: nksbookstore-discovery-service
-  #   container_name: discovery-service
-  #   depends_on:
-  #     - kafka
-  #   networks:
-  #     - nksbookstore-net
-  #   ports:
-  #     - "8761:8761"
+  discovery-service:
+    image: nksbookstore-discovery-service
+    container_name: discovery-service
+    depends_on:
+      - kafka
+    networks:
+      - nksbookstore-net
+    ports:
+      - "8761:8761"
+
+  user-service:
+    image: nksbookstore-user-service
+    container_name: user-service
+    depends_on:
+      - discovery-service
+      - kafka
+    env_file:
+      - .env
+    environment:
+      JWT_SECRET: ${LOCAL_JWT_SECRET}
+    networks:
+      - nksbookstore-net
+
+  order-service:
+    image: nksbookstore-order-service
+    container_name: order-service
+    depends_on:
+      - discovery-service
+      - kafka
+    env_file:
+      - .env
+    environment:
+      JWT_SECRET: ${LOCAL_JWT_SECRET}
+    networks:
+      - nksbookstore-net
+
+  cart-service:
+    image: nksbookstore-cart-service
+    container_name: cart-service
+    depends_on:
+      - discovery-service
+      - kafka
+    env_file:
+      - .env
+    environment:
+      JWT_SECRET: ${LOCAL_JWT_SECRET}
+    networks:
+      - nksbookstore-net
+
+  book-service:
+    image: nksbookstore-book-service
+    container_name: book-service
+    depends_on:
+      - discovery-service
+    env_file:
+      - .env
+    environment:
+      JWT_SECRET: ${LOCAL_JWT_SECRET}
+    networks:
+      - nksbookstore-net
