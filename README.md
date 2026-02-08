@@ -1,4 +1,4 @@
-📚 NK’s Book Store – Microservices Full Stack App
+**📚 NK’s Book Store – Microservices Full Stack App**
 
 A full-stack online bookstore built using Spring Boot microservices and a React frontend, designed to demonstrate scalable system design, secure authentication, and resilient service communication.
 
@@ -53,3 +53,17 @@ Discovery Service	Eureka server for service registration
 🐳 Dockerized microservices for consistent local development
 
 🧱 Clean layered architecture following SOLID principles
+
+📈 Future Improvements
+
+Cloud deployment (AWS/GCP/Azure)
+
+API Gateway integration
+
+CI/CD pipeline
+
+Centralized logging & monitoring
+
+👩‍💻 Author
+Niha Shaikh
+Java & Full Stack Developer
