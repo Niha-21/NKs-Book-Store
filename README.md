@@ -6,27 +6,21 @@ A full-stack online bookstore built using Spring Boot microservices and a React 
 
 ## 🚀 Tech Stack
 
-Backend
+### Backend
+- Java, Spring Boot
+- Spring Cloud (Eureka Service Discovery, OpenFeign)
+- JWT Authentication
+- Redis (Refresh Tokens)
+- JUnit & Mockito (Unit Testing)
 
-Java, Spring Boot
+### Frontend
+- React (Vite)  
+- JavaScript (ES6+)  
+- HTML5, CSS (Inline styling)  
 
-Spring Cloud (Eureka Service Discovery, OpenFeign)
-
-JWT Authentication
-
-Redis (Refresh Tokens)
-
-JUnit & Mockito (Unit Testing)
-
-Frontend
-
-React.js
-
-DevOps
-
-Docker & Docker Compose
-
-Environment-based configuration using .env
+### DevOps
+- Docker & Docker Compose
+- Environment-based configuration using .env
 
 ---
 
@@ -34,46 +28,42 @@ Environment-based configuration using .env
 
 The application follows a microservices architecture, where each service is independently deployable and communicates via REST.
 
-Service	Responsibility
-Auth Service	JWT authentication & token refresh
-User Service	User management
-Book Service	Book catalog & inventory
-Cart Service	Shopping cart management
-Order Service	Order placement & processing
-Discovery Service	Eureka server for service registration
+- Service	Responsibility
+- Auth Service	JWT authentication & token refresh
+- User Service	User management
+- Book Service	Book catalog & inventory
+- Cart Service	Shopping cart management
+- Order Service	Order placement & processing
+- Discovery Service	Eureka server for service registration
 
 ---
 
 ## ✨ Key Features
 
-🔐 JWT-based Authentication with secure refresh token handling
-
-🔎 Service Discovery (Eureka) for dynamic service registration
-
-🔗 Inter-service communication using OpenFeign
-
-♻️ Resilient order processing with retry, fallback, and failure handling
-
-🧪 Unit testing with JUnit & Mockito
-
-🐳 Dockerized microservices for consistent local development
-
-🧱 Clean layered architecture following SOLID principles
+- JWT-based Authentication with secure refresh token handling
+- Service Discovery (Eureka) for dynamic service registration
+- Inter-service communication using OpenFeign
+- Resilient order processing with retry, fallback, and failure handling
+- Unit testing with JUnit & Mockito
+- Dockerized microservices for consistent local development
+- Clean layered architecture following SOLID principles
 
 ---
 
 ## 📈 Future Improvements
 
-Cloud deployment (AWS/GCP/Azure)
-
-API Gateway integration
-
-CI/CD pipeline
-
-Centralized logging & monitoring
+- Cloud deployment (AWS/GCP/Azure)
+- API Gateway integration
+- CI/CD pipeline
+- Centralized logging & monitoring
 
 ---
 
 ## 👩‍💻 Author
-Niha Shaikh
-Java & Full Stack Developer
+
+**Niha Shaikh**  
+Software Engineer | Java / Full-Stack Developer  
+
+🔗 LinkedIn: https://www.linkedin.com/in/niha-shaikh-811685170/
+
+💻 GitHub: https://github.com/Niha-21
